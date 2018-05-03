@@ -1,7 +1,7 @@
 import React from 'react';
 import {View,Text,StyleSheet,Animated, Button} from 'react-native';
 import styles from './HomeScreenCompStyle.js';
-
+import apiKey from 'WeatherApp/src/Config/APIKey.js';
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
 
@@ -118,7 +118,7 @@ class HomeScreenComponent extends React.Component {
       <Animated.View style={[styles.container, { backgroundColor: color }]}>
 
         <Text style={styles.cityTitle}> Paris </Text>
-        <Text style={styles.cityWeatherInfo}> 3 </Text>
+        <Text style={styles.cityWeatherInfo}> {apiKey} </Text>
 
         <Animated.View style={[styles.stack1, { top: this.state.stack1Top, opacity: this.state.stack1Opacity}]}>
           <View style={styles.stackInsideWrapperview}>
