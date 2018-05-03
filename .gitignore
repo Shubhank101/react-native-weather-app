@@ -2,6 +2,11 @@
 #
 .DS_Store
 
+# config
+#
+src/
+Config/APIKey.js
+
 # Xcode
 #
 build/
