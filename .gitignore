@@ -4,6 +4,7 @@
 
 # config
 #
+src/Config/APIKey.js
 
 # Xcode
 #
