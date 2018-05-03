@@ -2,6 +2,8 @@ import React from 'react';
 import {View,Text,StyleSheet,Animated, Button} from 'react-native';
 import styles from './HomeScreenCompStyle.js';
 import apiKey from 'WeatherApp/src/Config/APIKey.js';
+import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
 
@@ -40,6 +42,12 @@ class HomeScreenComponent extends React.Component {
       stack2Top : new Animated.Value(200),
       stack3Opacity : new Animated.Value(0),
       stack3Top : new Animated.Value(200),
+      cities : ["Paris", "London", "Delhi"],
+      weather : ["10", "14", "34"],
+      citiesColors: [['rgba(0, 0, 0, 1)', 'rgba(0, 75, 130, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(200, 0, 130, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(50, 0, 50, 1)']],
+      currentCityIndex:0,
   };
 
   resetState = () => {
@@ -54,11 +62,29 @@ class HomeScreenComponent extends React.Component {
     });
   }
 
+  onSwipeUp(gestureState) {
+    var newIndex = this.state.currentCityIndex + 1;
+    if (newIndex > 2) {
+      newIndex = 0
+    }
+
+    this.setState( {
+      currentCityIndex: newIndex
+    })
+
+    this.resetState();
+
+    setTimeout(()=> {
+      this.animateViews()
+    } ,200)
+  }
+
   componentDidMount() {
     this.animateViews();
   }
 
   animateViews = () => {
+
     Animated.timing(this.state._color, {
         delay: 0,
         duration: 500,
@@ -109,31 +135,45 @@ class HomeScreenComponent extends React.Component {
   }
 
   render() {
+
+    const color1 =  this.state.citiesColors[this.state.currentCityIndex][0];
+    const color2 =  this.state.citiesColors[this.state.currentCityIndex][1];
     var color = this.state._color.interpolate({
       inputRange: [0, 1],
-      outputRange: ['rgba(0, 0, 0, 1)', 'rgba(0, 75, 130, 1)']
+      outputRange: [color1, color2]
     });
 
+    const config = {
+      velocityThreshold: 0.3,
+      directionalOffsetThreshold: 80
+    };
+
     return (
-      <Animated.View style={[styles.container, { backgroundColor: color }]}>
+      <GestureRecognizer style={styles.gestureContainer}
+          onSwipeUp={(state) => this.onSwipeUp(state)}
+          config={config}>
 
-        <Text style={styles.cityTitle}> Paris </Text>
-        <Text style={styles.cityWeatherInfo}> {apiKey} </Text>
+                <Animated.View style={[styles.container,{backgroundColor: color}]}>
 
-        <Animated.View style={[styles.stack1, { top: this.state.stack1Top, opacity: this.state.stack1Opacity}]}>
-          <View style={styles.stackInsideWrapperview}>
-          </View>
-        </Animated.View>
-        <Animated.View style={[styles.stack2, { top: this.state.stack2Top, opacity: this.state.stack2Opacity}]}>
-          <View style={styles.stackInsideWrapperview}>
-          </View>
-        </Animated.View>
-        <Animated.View style={[styles.stack3, { top: this.state.stack2Top, opacity: this.state.stack3Opacity}]}>
-          <View style={styles.stackInsideWrapperview}>
+                  <Text style={styles.cityTitle}> {this.state.cities[this.state.currentCityIndex]} </Text>
+                  <Text style={styles.cityWeatherInfo}> {this.state.weather[this.state.currentCityIndex]}° </Text>
 
-          </View>
-        </Animated.View>
-      </Animated.View>
+                  <Animated.View style={[styles.stack1, { top: this.state.stack1Top, opacity: this.state.stack1Opacity}]}>
+                    <View style={styles.stackInsideWrapperview}>
+                    </View>
+                  </Animated.View>
+                  <Animated.View style={[styles.stack2, { top: this.state.stack2Top, opacity: this.state.stack2Opacity}]}>
+                    <View style={styles.stackInsideWrapperview}>
+                    </View>
+                  </Animated.View>
+                  <Animated.View style={[styles.stack3, { top: this.state.stack2Top, opacity: this.state.stack3Opacity}]}>
+                    <View style={styles.stackInsideWrapperview}>
+
+                    </View>
+                  </Animated.View>
+                </Animated.View>
+      </GestureRecognizer>
+
 
     );
   }

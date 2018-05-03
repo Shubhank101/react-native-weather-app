@@ -1,8 +1,14 @@
 import {StyleSheet} from 'react-native';
 
 export default style = StyleSheet.create({
+  gestureContainer: {
+    flex:1,
+
+  },
+
   container: {
     flex:1,
+    width:'100%',
     justifyContent:'center',
     alignItems:'center',
     paddingLeft:30,
