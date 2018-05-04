@@ -3,8 +3,7 @@
 .DS_Store
 
 # config
-#
-src/Config/APIKey.js
+#src/config/APIKey.js
 
 # Xcode
 #

@@ -1,8 +1,8 @@
 import React from 'react';
 import {View,Text,StyleSheet,Animated, Button} from 'react-native';
 import styles from './HomeScreenCompStyle.js';
-import apiKey from 'WeatherApp/src/Config/APIKey.js';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+import Webservice from 'WeatherApp/src/services/Webservice.js';
 
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
@@ -41,9 +41,10 @@ class HomeScreenComponent extends React.Component {
       cities : ["Paris", "London", "Delhi"],
       weather : ["10", "14", "34"],
       citiesColors: [['rgba(0, 0, 0, 1)', 'rgba(0, 75, 130, 1)'],
-                     ['rgba(0, 0, 0, 1)', 'rgba(200, 0, 130, 1)'],
-                     ['rgba(0, 0, 0, 1)', 'rgba(50, 0, 50, 1)']],
+                     ['rgba(0, 0, 0, 1)', 'rgba(0, 191, 255, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(70, 70, 70, 1)']],
       currentCityIndex:0,
+      weatherInfo:null,
   };
 
   resetState = () => {
@@ -75,7 +76,13 @@ class HomeScreenComponent extends React.Component {
     this.animateViews();
   }
 
-  animateViews = () => {
+ animateViews = async() => {
+
+    let weatherInfo = await Webservice.getWeatherData(this.state.cities[this.state.currentCityIndex]);
+
+    this.setState({
+      weatherInfo: weatherInfo
+    });
 
     Animated.timing(this.state._color, {
         delay: 0,
@@ -129,6 +136,11 @@ class HomeScreenComponent extends React.Component {
                     this.state.cities.map((item,index) =>
                       <Animated.View key={index} style={[styles.stack, { top: this.state.stackTop, opacity: this.state.stackOpacity}]}>
                         <View style={styles.stackInsideWrapperview}>
+                          {index === 0 && this.state.weatherInfo &&
+                            <Text style={{fontSize:40, color:"white"}}>
+                                {this.state.weatherInfo.weather}
+                            </Text>
+                          }
                         </View>
                       </Animated.View>
                     )
