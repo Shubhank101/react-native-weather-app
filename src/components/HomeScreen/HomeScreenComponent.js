@@ -36,12 +36,8 @@ class HomeScreenComponent extends React.Component {
 
   state = {
       _color : new Animated.Value(0),
-      stack1Opacity : new Animated.Value(0),
-      stack1Top : new Animated.Value(200),
-      stack2Opacity : new Animated.Value(0),
-      stack2Top : new Animated.Value(200),
-      stack3Opacity : new Animated.Value(0),
-      stack3Top : new Animated.Value(200),
+      stackOpacity : new Animated.Value(0),
+      stackTop : new Animated.Value(200),
       cities : ["Paris", "London", "Delhi"],
       weather : ["10", "14", "34"],
       citiesColors: [['rgba(0, 0, 0, 1)', 'rgba(0, 75, 130, 1)'],
@@ -53,12 +49,8 @@ class HomeScreenComponent extends React.Component {
   resetState = () => {
     this.setState( {
       _color : new Animated.Value(0),
-      stack1Opacity : new Animated.Value(0),
-      stack1Top : new Animated.Value(200),
-      stack2Opacity : new Animated.Value(0),
-      stack2Top : new Animated.Value(200),
-      stack3Opacity : new Animated.Value(0),
-      stack3Top : new Animated.Value(200),
+      stackOpacity : new Animated.Value(0),
+      stackTop : new Animated.Value(200),
     });
   }
 
@@ -94,43 +86,18 @@ class HomeScreenComponent extends React.Component {
     const duration = 400;
 
     Animated.parallel([
-        Animated.timing(this.state.stack1Opacity, {
+        Animated.timing(this.state.stackOpacity, {
             delay: 0,
             duration: duration,
             toValue: 1
         }),
-        Animated.timing(this.state.stack1Top, {
+        Animated.timing(this.state.stackTop, {
             delay: 0,
             duration: duration,
             toValue: 0
         })
     ]).start();
 
-    Animated.parallel([
-        Animated.timing(this.state.stack2Opacity, {
-            delay: 0,
-            duration: duration,
-            toValue: 1
-        }),
-        Animated.timing(this.state.stack2Top, {
-            delay: 0,
-            duration: duration,
-            toValue: 0
-        })
-    ]).start();
-
-    Animated.parallel([
-        Animated.timing(this.state.stack3Opacity, {
-            delay: 0,
-            duration: duration,
-            toValue: 1
-        }),
-        Animated.timing(this.state.stack3Top, {
-            delay: 0,
-            duration: duration,
-            toValue: 0
-        })
-    ]).start();
 
   }
 
@@ -158,19 +125,16 @@ class HomeScreenComponent extends React.Component {
                   <Text style={styles.cityTitle}> {this.state.cities[this.state.currentCityIndex]} </Text>
                   <Text style={styles.cityWeatherInfo}> {this.state.weather[this.state.currentCityIndex]}° </Text>
 
-                  <Animated.View style={[styles.stack1, { top: this.state.stack1Top, opacity: this.state.stack1Opacity}]}>
-                    <View style={styles.stackInsideWrapperview}>
-                    </View>
-                  </Animated.View>
-                  <Animated.View style={[styles.stack2, { top: this.state.stack2Top, opacity: this.state.stack2Opacity}]}>
-                    <View style={styles.stackInsideWrapperview}>
-                    </View>
-                  </Animated.View>
-                  <Animated.View style={[styles.stack3, { top: this.state.stack2Top, opacity: this.state.stack3Opacity}]}>
-                    <View style={styles.stackInsideWrapperview}>
+                  {
+                    this.state.cities.map((item,index) =>
+                      <Animated.View key={index} style={[styles.stack, { top: this.state.stackTop, opacity: this.state.stackOpacity}]}>
+                        <View style={styles.stackInsideWrapperview}>
+                        </View>
+                      </Animated.View>
+                    )
+                  }
 
-                    </View>
-                  </Animated.View>
+
                 </Animated.View>
       </GestureRecognizer>
 

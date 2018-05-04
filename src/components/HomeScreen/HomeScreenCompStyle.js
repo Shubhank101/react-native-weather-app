@@ -15,24 +15,13 @@ export default style = StyleSheet.create({
     paddingRight:30,
   },
 
-  stack1:{
+  stack:{
     margin:10,
     top:0,
     flex:0.2,
     width:'100%',
   },
 
-  stack2:{
-    width:'100%',
-    margin:10,
-    flex:0.2,
-  },
-
-  stack3:{
-    width:'100%',
-    margin:10,
-    flex:0.2,
-  },
 
   stackInsideWrapperview: {
     width:'100%',
