@@ -15,6 +15,12 @@ export default style = StyleSheet.create({
     paddingRight:30,
   },
 
+  navBarRightButton: {
+    color:"white",
+    fontSize: 19,
+    paddingRight:8,
+  },
+  
   stack:{
     margin:10,
     top:0,

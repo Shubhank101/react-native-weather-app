@@ -1,8 +1,9 @@
 import React from 'react';
-import {View,Text,StyleSheet,Animated, Button} from 'react-native';
+import {View,Text,StyleSheet,Animated, TouchableOpacity} from 'react-native';
 import styles from './HomeScreenCompStyle.js';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import Webservice from 'WeatherApp/src/services/Webservice.js';
+import HomeScreenWeatherModel from './HomeScreenWeatherModel.js';
 
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
@@ -17,18 +18,18 @@ class HomeScreenComponent extends React.Component {
     headerTintColor: '#fff',
     headerStyle:{ position: 'absolute', backgroundColor: 'rgba(255,255,255,0.3)', zIndex: 100, top: 0, left: 0, right: 0 },
     headerRight: (
-      <Button
+      <TouchableOpacity
         onPress={() => {
-          homeScreenComp.resetState();
-
-          setTimeout(()=> {
-            homeScreenComp.animateViews()
-          } ,200)
-        }
-      }
-        title = 'Reload'
-        color="#fff"
-      />
+            homeScreenComp.resetState();
+  
+            setTimeout(()=> {
+              homeScreenComp.animateViews()
+            } ,200)
+          }
+        }       
+      >
+        <Text style={styles.navBarRightButton}> Reload </Text>
+      </TouchableOpacity>
     )
   }
 
@@ -78,8 +79,8 @@ class HomeScreenComponent extends React.Component {
 
  animateViews = async() => {
 
-    let weatherInfo = await Webservice.getWeatherData(this.state.cities[this.state.currentCityIndex]);
-
+    let json = await Webservice.getWeatherData(this.state.cities[this.state.currentCityIndex]);
+    let weatherInfo = HomeScreenWeatherModel.getWeatherObjectFromJSON(json);
     this.setState({
       weatherInfo: weatherInfo
     });
@@ -104,8 +105,6 @@ class HomeScreenComponent extends React.Component {
             toValue: 0
         })
     ]).start();
-
-
   }
 
   render() {
@@ -129,22 +128,37 @@ class HomeScreenComponent extends React.Component {
 
                 <Animated.View style={[styles.container,{backgroundColor: color}]}>
 
-                  <Text style={styles.cityTitle}> {this.state.cities[this.state.currentCityIndex]} </Text>
-                  <Text style={styles.cityWeatherInfo}> {this.state.weather[this.state.currentCityIndex]}° </Text>
-
-                  {
-                    this.state.cities.map((item,index) =>
-                      <Animated.View key={index} style={[styles.stack, { top: this.state.stackTop, opacity: this.state.stackOpacity}]}>
-                        <View style={styles.stackInsideWrapperview}>
-                          {index === 0 && this.state.weatherInfo &&
-                            <Text style={{fontSize:40, color:"white"}}>
-                                {this.state.weatherInfo.weather}
-                            </Text>
-                          }
-                        </View>
-                      </Animated.View>
-                    )
-                  }
+                    <Text style={styles.cityTitle}>
+                      {this.state.cities[this.state.currentCityIndex]}
+                    </Text>
+                    
+                    <Text style={styles.cityWeatherInfo}>
+                      {this.state.weatherInfo && this.state.weatherInfo.temp}°
+                    </Text>
+  
+                    {
+                      this.state.cities.map((item,index) =>
+                        <Animated.View key={index} style={[styles.stack, { top: this.state.stackTop, opacity: this.state.stackOpacity}]}>
+                          <View style={styles.stackInsideWrapperview}>
+                            {index === 0 && this.state.weatherInfo &&
+                              <Text style={{fontSize:18, color:"white"}}>
+                                  Weather: {this.state.weatherInfo.weather}
+                              </Text>
+                            }
+                            {index === 1 && this.state.weatherInfo &&
+                              <Text numberOfLines={1} style={{fontSize:18, color:"white"}}>
+                                  Wind: {HomeScreenWeatherModel.formattedWindSpeed(this.state.weatherInfo.wind)}
+                              </Text>
+                            }
+                            {index === 2 && this.state.weatherInfo &&
+                              <Text numberOfLines={1} style={{fontSize:18, color:"white"}}>
+                                  Humidity: {this.state.weatherInfo.humidity}%
+                              </Text>
+                            }
+                          </View>
+                        </Animated.View>
+                      )
+                    }
 
 
                 </Animated.View>
