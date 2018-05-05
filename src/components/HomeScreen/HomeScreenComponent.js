@@ -4,6 +4,7 @@ import styles from './HomeScreenCompStyle.js';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import Webservice from 'WeatherApp/src/services/Webservice.js';
 import HomeScreenWeatherModel from './HomeScreenWeatherModel.js';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
@@ -141,9 +142,12 @@ class HomeScreenComponent extends React.Component {
                         <Animated.View key={index} style={[styles.stack, { top: this.state.stackTop, opacity: this.state.stackOpacity}]}>
                           <View style={styles.stackInsideWrapperview}>
                             {index === 0 && this.state.weatherInfo &&
-                              <Text style={{fontSize:18, color:"white"}}>
+                              <View style={styles.weatherView}>
+                                <Icon style={styles.icon} name="ios-rainy" size={60} color="#fff"  />
+                                <Text style={{fontSize:18, color:"white"}}>
                                   Weather: {this.state.weatherInfo.weather}
-                              </Text>
+                                </Text>
+                              </View>
                             }
                             {index === 1 && this.state.weatherInfo &&
                               <Text numberOfLines={1} style={{fontSize:18, color:"white"}}>

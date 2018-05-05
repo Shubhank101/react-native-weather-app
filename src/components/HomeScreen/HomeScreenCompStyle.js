@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet,Platform} from 'react-native';
 
 export default style = StyleSheet.create({
   gestureContainer: {
@@ -39,12 +39,28 @@ export default style = StyleSheet.create({
   },
 
   cityTitle: {
-    fontSize:22, color:"white"
+    fontSize:22,
+    color:"white",
+    fontWeight:"bold"
   },
 
   cityWeatherInfo: {
     fontSize:70,
-    color:"white"
+    color:"white",
+    fontWeight:"100",
+    fontFamily: Platform.OS === 'android' ? 'sans-serif-light' : undefined    
+  },
+  
+  weatherView:{
+    flex:1,
+    flexDirection:"row",
+    justifyContent:"center",
+    alignItems:"center"  
+  },
+  
+  icon: {
+    padding:10
   }
+  
 
 });
