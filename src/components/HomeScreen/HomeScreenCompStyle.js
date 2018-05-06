@@ -3,9 +3,7 @@ import {StyleSheet,Platform} from 'react-native';
 export default style = StyleSheet.create({
   gestureContainer: {
     flex:1,
-
   },
-
   container: {
     flex:1,
     width:'100%',
@@ -17,8 +15,8 @@ export default style = StyleSheet.create({
 
   navBarRightButton: {
     color:"white",
-    fontSize: 19,
     paddingRight:8,
+    paddingLeft:8,
   },
   
   stack:{
@@ -60,6 +58,34 @@ export default style = StyleSheet.create({
   
   icon: {
     padding:10
+  },
+  
+  
+  //onboarding
+  onBoardContainer: {
+    flex:1,
+    width:'100%',
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:"#333",
+    paddingLeft:30,
+    paddingRight:30,
+  },
+  
+  onboardingText:{
+    fontSize:18,
+    color:"white",
+    textAlign:'center',
+    marginBottom:10,
+  },
+  
+  modalContainer: {
+    flex:1,
+    paddingTop:50,
+    backgroundColor:"#333",
+    width:"100%",
+    justifyContent:"center",
+    alignItems:"center"
   }
   
 
