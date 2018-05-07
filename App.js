@@ -6,7 +6,8 @@
 
 import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation';
-
+import {Provider} from 'react-redux';
+import store from 'WeatherApp/src/store.js';
 
 import SplashScreenComponent from 'WeatherApp/src/components/SplashScreen/SplashScreenComponent.js';
 import HomeScreenComponent from 'WeatherApp/src/components/HomeScreen/HomeScreenComponent.js';
@@ -24,7 +25,10 @@ type Props = {};
 export default class App extends Component<Props> {
   render() {
     return (
-      <StackNavigation/>
+      <Provider store={store}>
+        <StackNavigation/>  
+      </Provider>
+
     );
   }
 }

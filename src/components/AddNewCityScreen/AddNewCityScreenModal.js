@@ -4,18 +4,16 @@ import {View,Text,TextInput,TouchableOpacity,Button} from 'react-native';
 import styles from './AddNewCityCompStyle.js';
 import Autocomplete from 'react-native-autocomplete-input';
 import sourceData from 'WeatherApp/src/data/cities.json';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import * as Actions from './actions.js';
 
-export default class AddNewCityScrenModal extends React.Component {
+class AddNewCityScrenModal extends React.Component {
   state = {
     isVisible:true,
     query:null,
   }
-
-  onDismissModal = () => {
-   this.setState({ isVisible: false })
-  }
-
-
+  
   render() {
     var data = sourceData.data;
     if (this.state.query) {
@@ -40,7 +38,7 @@ export default class AddNewCityScrenModal extends React.Component {
               )}>
             </Autocomplete>
          </View>
-           <TouchableOpacity style={styles.doneButtonWrapper} onPress={()=> {}}>
+           <TouchableOpacity style={styles.doneButtonWrapper} onPress={()=> {this.props.cityAdded(this.state.query)}}>
              <Text style={styles.doneText}>DONE</Text>
            </TouchableOpacity>
       </View>
@@ -48,3 +46,8 @@ export default class AddNewCityScrenModal extends React.Component {
     );
   }
 }
+
+mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(Actions,dispatch);
+}
+export default connect(null,mapDispatchToProps)(AddNewCityScrenModal);

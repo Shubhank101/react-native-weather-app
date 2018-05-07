@@ -8,6 +8,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Permissions from 'react-native-permissions';
 import Geocoder from 'react-native-geocoder';
 import AddNewCityScreenModal from 'WeatherApp/src/components/AddNewCityScreen/AddNewCityScreenModal.js';
+import {connect} from 'react-redux';
+
 
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
@@ -25,14 +27,14 @@ class HomeScreenComponent extends React.Component {
         <TouchableOpacity
               onPress={() => {
                   homeScreenComp.resetState();
-        
+
                   setTimeout(()=> {
                     homeScreenComp.animateViews()
                   } ,200)
                 }
-              }       
+              }
             >
-        
+
           <Icon style={styles.navBarRightButton} name="ios-settings" size={30} color="#fff"  />
         </TouchableOpacity>
     ),
@@ -42,7 +44,7 @@ class HomeScreenComponent extends React.Component {
         onPress={() => {
             homeScreenComp.addCity();
           }
-        }       
+        }
       >
         <Icon style={styles.navBarRightButton} name="ios-add" size={40} color="#fff"  />
       </TouchableOpacity>
@@ -62,6 +64,8 @@ class HomeScreenComponent extends React.Component {
                      ['rgba(0, 0, 0, 1)', 'rgba(70, 70, 70, 1)']],
       currentCityIndex:0,
       weatherInfo:null,
+      shouldShowAddCityPopup:false,
+      isLoading:true
   };
 
   resetState = () => {
@@ -74,7 +78,7 @@ class HomeScreenComponent extends React.Component {
 
   onSwipeUp(gestureState) {
     var newIndex = this.state.currentCityIndex + 1;
-    if (newIndex > 2) {
+    if (newIndex >= this.state.cities.length) {
       newIndex = 0
     }
 
@@ -90,56 +94,60 @@ class HomeScreenComponent extends React.Component {
   }
 
   componentDidMount() {
-    
-    
+
      Permissions.check('location').then(response => {
       // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
       this.setState({ locationPermission: response })
       this._handlePermissionResult(response);
     });
 
-   
+
     this.animateViews();
   }
-  
-  
+
+
   _handlePermissionResult = (result) => {
     if (result == 'authorized') {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          
+
           // Position Geocoding
           let location = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
-          
+
           Geocoder.geocodePosition(location).then(res => {
             if (res.length > 0) {
                let geocodingObj = res[0];
                this.setState({
-                  cities:[geocodingObj.adminArea]
+                  cities:[geocodingObj.adminArea.length  > 2 ?  geocodingObj.adminArea: geocodingObj.subAdminArea]
                })
                this.animateViews();
             }
-              
+
           })
-          .catch(err => console.warn(err))
-          
+          .catch(err => {
+            this.setState({ locationError: err.message })
+          })
+
         },
-        (error) => {console.warn(error); this.setState({ error: error.message })},
+        (error) => {
+          //console.warn(error); this.setState({ error: error.message })
+          this.setState({ locationError: error.message })
+        },
         { enableHighAccuracy: true, timeout: 20000 },
       );
-      
-      
-      
+
+
+
 
     }
     else if (result == 'undetermined') {
       this._requestPermission();
     }
     else if (result == 'denied') {
-      this.setState({ error: "User didn't give location permission" })
+      this.setState({ locationError: "User didn't give location permission" })
     }
   }
 
@@ -184,27 +192,64 @@ class HomeScreenComponent extends React.Component {
   }
 
   addCity = () => {
-    
+    this.setState({
+      shouldShowAddCityPopup:true
+    })
   }
-  
-  render() {
-    return (
-      <View style={styles.modalContainer}>
-        <AddNewCityScreenModal />
-      </View>
-    );
-  
-  
-    if (this.state.cities.length == 0) {
-      // show onboarding
-      return (
-        <View style={styles.onBoardContainer}>
-            <Text style={styles.onboardingText}> Go Ahead and add city </Text>
-            <Button title="Add city" onPress={() => this.addCity()}/>
-        </View>
-      )
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.currentCityAdded) {
+      this.setState((prevState) => {
+        return {
+          cities:[...prevState.cities, nextProps.currentCityAdded],
+          shouldShowAddCityPopup:false,
+          currentCityIndex: prevState.cities.length
+        }
+
+      });
+
+      this.resetState();
+      setTimeout(()=>{
+        this.animateViews();
+      },300);
+
     }
-  
+  }
+
+
+  render() {
+
+    if (this.state.shouldShowAddCityPopup) {
+      return (
+        <View style={styles.modalContainer}>
+          <AddNewCityScreenModal />
+        </View>
+      );
+    }
+
+
+
+    if (this.state.cities.length == 0) {
+
+      if (this.state.locationError) {
+        // show onboarding
+        return (
+          <View style={styles.onBoardContainer}>
+              <Text style={styles.onboardingText}> Go Ahead and add city </Text>
+              <Button title="Add city" onPress={() => this.addCity()}/>
+          </View>
+        )
+      }
+      else if (this.state.isLoading) {
+        return (
+          <View style={styles.onBoardContainer}>
+              <Text style={styles.onboardingText}> Loading </Text>
+          </View>
+        )
+      }
+
+    }
+
     const color1 =  this.state.citiesColors[this.state.currentCityIndex][0];
     const color2 =  this.state.citiesColors[this.state.currentCityIndex][1];
     var color = this.state._color.interpolate({
@@ -226,11 +271,11 @@ class HomeScreenComponent extends React.Component {
                     <Text style={styles.cityTitle}>
                       {this.state.cities[this.state.currentCityIndex]}
                     </Text>
-                    
+
                     <Text style={styles.cityWeatherInfo}>
                       {this.state.weatherInfo && this.state.weatherInfo.temp}°
                     </Text>
-  
+
                     {
                       this.state.attributes.map((item,index) =>
                         <Animated.View key={index} style={[styles.stack, { top: this.state.stackTop, opacity: this.state.stackOpacity}]}>
@@ -268,4 +313,10 @@ class HomeScreenComponent extends React.Component {
 }
 
 
-export default HomeScreenComponent;
+mapStateToProps = (state,props) => {
+  return {
+    currentCityAdded:state.cityReducer.city
+  }
+}
+
+export default connect(mapStateToProps,null)(HomeScreenComponent);
