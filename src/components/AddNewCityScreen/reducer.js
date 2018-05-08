@@ -5,7 +5,7 @@ let dataState = {city:null}
 const cityReducer = (state = dataState, action) => {
   switch (action.type) {
     case CITY_ADDED:
-      state = Object.assign({}, state, { city: action.data });
+      state = Object.assign({}, state, { city: action.data, shouldShowAddCityPopup: false });
       return state;
     case CITY_MODAL_DISMISS:
       state = Object.assign({}, state, { shouldShowAddCityPopup: false });
