@@ -1,5 +1,6 @@
 import React from 'react';
 import {View,Text,StyleSheet,Animated,Button, TouchableOpacity} from 'react-native';
+import {bindActionCreators} from 'redux';
 import styles from './HomeScreenCompStyle.js';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import Webservice from 'WeatherApp/src/services/Webservice.js';
@@ -9,6 +10,7 @@ import Permissions from 'react-native-permissions';
 import Geocoder from 'react-native-geocoder';
 import AddNewCityScreenModal from 'WeatherApp/src/components/AddNewCityScreen/AddNewCityScreenModal.js';
 import {connect} from 'react-redux';
+import * as Actions from './actions.js';
 
 
 var homeScreenComp; // to use in navigation right button
@@ -64,7 +66,6 @@ class HomeScreenComponent extends React.Component {
                      ['rgba(0, 0, 0, 1)', 'rgba(70, 70, 70, 1)']],
       currentCityIndex:0,
       weatherInfo:null,
-      shouldShowAddCityPopup:false,
       isLoading:true
   };
 
@@ -192,9 +193,7 @@ class HomeScreenComponent extends React.Component {
   }
 
   addCity = () => {
-    this.setState({
-      shouldShowAddCityPopup:true
-    })
+    this.props.showCityModal();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -205,7 +204,6 @@ class HomeScreenComponent extends React.Component {
           shouldShowAddCityPopup:false,
           currentCityIndex: prevState.cities.length
         }
-
       });
 
       this.resetState();
@@ -218,8 +216,7 @@ class HomeScreenComponent extends React.Component {
 
 
   render() {
-
-    if (this.state.shouldShowAddCityPopup) {
+    if (this.props.shouldShowAddCityPopup) {
       return (
         <View style={styles.modalContainer}>
           <AddNewCityScreenModal />
@@ -313,10 +310,17 @@ class HomeScreenComponent extends React.Component {
 }
 
 
-mapStateToProps = (state,props) => {
+mapStateToProps = (state) => {
+
   return {
-    currentCityAdded:state.cityReducer.city
+    currentCityAdded:state.cityReducer.city,
+    shouldShowAddCityPopup:state.homeReducer.shouldShowAddCityPopup
   }
+
 }
 
-export default connect(mapStateToProps,null)(HomeScreenComponent);
+mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(Actions,dispatch);
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(HomeScreenComponent);

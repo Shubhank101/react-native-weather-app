@@ -1,5 +1,4 @@
-import {combineReducers} from 'redux';
-import {CITY_ADDED} from './actions.js';
+import {CITY_ADDED,CITY_MODAL_DISMISS} from './actions.js';
 
 let dataState = {city:null}
 
@@ -8,13 +7,13 @@ const cityReducer = (state = dataState, action) => {
     case CITY_ADDED:
       state = Object.assign({}, state, { city: action.data });
       return state;
+    case CITY_MODAL_DISMISS:
+      state = Object.assign({}, state, { shouldShowAddCityPopup: false });
+      return state;
     default:
       return state;
   }
 };
 
-const rootReducer = combineReducers({
-  cityReducer
-})
 
-export default rootReducer;
+export default cityReducer;

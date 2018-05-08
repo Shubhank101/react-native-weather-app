@@ -21,8 +21,8 @@ export default style = StyleSheet.create({
 
   doneButtonWrapper: {
     backgroundColor:"#222",
-    width:"100%",
     height:50,
+    width:"50%",
     alignItems:"center",
     justifyContent:"center"
   },

@@ -1,6 +1,11 @@
-import {createStore} from 'redux';
+import {createStore,combineReducers} from 'redux';
 
 
-import reducers from 'WeatherApp/src/components/AddNewCityScreen/reducer.js';
+import cityReducer from 'WeatherApp/src/components/AddNewCityScreen/reducer.js';
+import homeReducer from 'WeatherApp/src/components/HomeScreen/reducer.js';
 
-export default createStore(reducers);
+const reducer = combineReducers({
+  cityReducer,
+  homeReducer
+})
+export default createStore(reducer);

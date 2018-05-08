@@ -13,7 +13,7 @@ class AddNewCityScrenModal extends React.Component {
     isVisible:true,
     query:null,
   }
-  
+
   render() {
     var data = sourceData.data;
     if (this.state.query) {
@@ -38,9 +38,16 @@ class AddNewCityScrenModal extends React.Component {
               )}>
             </Autocomplete>
          </View>
-           <TouchableOpacity style={styles.doneButtonWrapper} onPress={()=> {this.props.cityAdded(this.state.query)}}>
-             <Text style={styles.doneText}>DONE</Text>
+         <View style={{flex:1}}/>
+         <View style={{width:"100%",height:50, flexDirection:"row"}}>
+           <TouchableOpacity style={styles.doneButtonWrapper} onPress={()=> {this.props.dismissCityPopup()}}>
+             <Text style={styles.doneText}>CANCEL</Text>
            </TouchableOpacity>
+           <TouchableOpacity style={[styles.doneButtonWrapper, {backgroundColor:"#666"}]} onPress={()=> {this.props.cityAdded(this.state.query)}}>
+             <Text style={[styles.doneText, {fontWeight:"bold"}]}>DONE</Text>
+           </TouchableOpacity>
+         </View>
+
       </View>
 
     );
