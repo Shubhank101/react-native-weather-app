@@ -12,7 +12,6 @@ import AddNewCityScreenModal from 'WeatherApp/src/components/AddNewCityScreen/Ad
 import {connect} from 'react-redux';
 import * as Actions from './actions.js';
 
-
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
 
@@ -63,7 +62,9 @@ class HomeScreenComponent extends React.Component {
       attributes: ["Weather", "Wind", "Humidity"],
       citiesColors: [['rgba(0, 0, 0, 1)', 'rgba(0, 75, 130, 1)'],
                      ['rgba(0, 0, 0, 1)', 'rgba(0, 191, 255, 1)'],
-                     ['rgba(0, 0, 0, 1)', 'rgba(70, 70, 70, 1)']],
+                     ['rgba(0, 0, 0, 1)', 'rgba(70, 70, 70, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(220, 70, 70, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(150, 75, 30, 1)']],
       currentCityIndex:0,
       weatherInfo:null,
       isLoading:true
@@ -206,6 +207,7 @@ class HomeScreenComponent extends React.Component {
         }
       });
 
+      this.props.clearCityAdded();
       this.resetState();
       setTimeout(()=>{
         this.animateViews();
@@ -214,6 +216,25 @@ class HomeScreenComponent extends React.Component {
     }
   }
 
+  renderWeatherIcon = () => {
+    var icon = ""
+    switch (this.state.weatherInfo.weather) {
+      case "Clouds":
+        icon = "ios-cloudy";
+        break;
+      case "Haze":
+        icon = "ios-sunny";
+        break;
+      case "Clear":
+        icon = "ios-sunny";
+        break;
+      case "Night":
+        icon = "ios-moon";
+        break;
+    }
+
+    return (<Icon style={styles.icon} name={icon} size={60} color="#fff"  />);
+  }
 
   render() {
     if (this.props.shouldShowAddCityPopup) {
@@ -247,6 +268,7 @@ class HomeScreenComponent extends React.Component {
 
     }
 
+    console.log(this.state.currentCityIndex);
     const color1 =  this.state.citiesColors[this.state.currentCityIndex][0];
     const color2 =  this.state.citiesColors[this.state.currentCityIndex][1];
     var color = this.state._color.interpolate({
@@ -279,9 +301,9 @@ class HomeScreenComponent extends React.Component {
                           <View style={styles.stackInsideWrapperview}>
                             {index === 0 && this.state.weatherInfo &&
                               <View style={styles.weatherView}>
-                                <Icon style={styles.icon} name="ios-rainy" size={60} color="#fff"  />
+                                {this.renderWeatherIcon()}
                                 <Text style={{fontSize:18, color:"white"}}>
-                                  Weather: {this.state.weatherInfo.weather}
+                                   {this.state.weatherInfo.weather}
                                 </Text>
                               </View>
                             }
