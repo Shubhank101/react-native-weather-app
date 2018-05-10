@@ -59,6 +59,7 @@ class HomeScreenComponent extends React.Component {
       stackOpacity : new Animated.Value(0),
       stackTop : new Animated.Value(200),
       cities : [],
+      subAdminArea:[],
       attributes: ["Weather", "Wind", "Humidity"],
       citiesColors: [['rgba(0, 0, 0, 1)', 'rgba(0, 75, 130, 1)'],
                      ['rgba(0, 0, 0, 1)', 'rgba(0, 191, 255, 1)'],
@@ -122,8 +123,12 @@ class HomeScreenComponent extends React.Component {
           Geocoder.geocodePosition(location).then(res => {
             if (res.length > 0) {
                let geocodingObj = res[0];
-               this.setState({
-                  cities:[geocodingObj.adminArea.length  > 2 ?  geocodingObj.adminArea: geocodingObj.subAdminArea]
+               this.setState(() => {
+                 return {
+                  cities:[geocodingObj.adminArea],
+                  subAdminArea:[geocodingObj.subAdminArea]
+                 }
+
                })
                this.animateViews();
             }
@@ -165,7 +170,18 @@ class HomeScreenComponent extends React.Component {
     if (this.state.cities.length == 0) {
       return;
     }
-    let json = await Webservice.getWeatherData(this.state.cities[this.state.currentCityIndex]);
+    var json = await Webservice.getWeatherData(this.state.cities[this.state.currentCityIndex]);
+    if (json == null) {
+      json = await Webservice.getWeatherData(this.state.subAdminArea[this.state.currentCityIndex]);
+      if (json) {
+        // replace state cities with subAdminArea
+        var newCities = this.state.cities;
+        newCities[this.state.currentCityIndex] = this.state.subAdminArea[this.state.currentCityIndex];
+        this.setState((prevState) => {
+          cities: newCities
+        });
+      }
+    }
     let weatherInfo = HomeScreenWeatherModel.getWeatherObjectFromJSON(json);
     this.setState({
       weatherInfo: weatherInfo
@@ -202,6 +218,7 @@ class HomeScreenComponent extends React.Component {
       this.setState((prevState) => {
         return {
           cities:[...prevState.cities, nextProps.currentCityAdded],
+          subAdminArea:[...prevState.subAdminArea, nextProps.currentCityAdded],
           shouldShowAddCityPopup:false,
           currentCityIndex: prevState.cities.length
         }
@@ -268,7 +285,6 @@ class HomeScreenComponent extends React.Component {
 
     }
 
-    console.log(this.state.currentCityIndex);
     const color1 =  this.state.citiesColors[this.state.currentCityIndex][0];
     const color2 =  this.state.citiesColors[this.state.currentCityIndex][1];
     var color = this.state._color.interpolate({
