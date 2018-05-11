@@ -9,6 +9,7 @@ export default {
     paddingTop:64,
   },
 
+
   navCloseIcon: {
     paddingLeft:10,
   },
