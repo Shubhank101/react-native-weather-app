@@ -27,11 +27,7 @@ class HomeScreenComponent extends React.Component {
     headerLeft: (
         <TouchableOpacity
               onPress={() => {
-                  homeScreenComp.resetState();
-
-                  setTimeout(()=> {
-                    homeScreenComp.animateViews()
-                  } ,200)
+                  homeScreenComp.props.navigation.navigate("Settings");
                 }
               }
             >

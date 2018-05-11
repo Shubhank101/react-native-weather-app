@@ -43,8 +43,8 @@ class AddNewCityScrenModal extends React.Component {
            <TouchableOpacity style={styles.doneButtonWrapper} onPress={()=> {this.props.dismissCityPopup()}}>
              <Text style={styles.doneText}>CANCEL</Text>
            </TouchableOpacity>
-           <TouchableOpacity style={[styles.doneButtonWrapper, {backgroundColor:"#666"}]} onPress={()=> {this.props.cityAdded(this.state.query)}}>
-             <Text style={[styles.doneText, {fontWeight:"bold"}]}>DONE</Text>
+           <TouchableOpacity style={[styles.doneButtonWrapper, {backgroundColor:"#444"}]} onPress={()=> {this.props.cityAdded(this.state.query)}}>
+             <Text style={[styles.doneText]}>DONE</Text>
            </TouchableOpacity>
          </View>
 
