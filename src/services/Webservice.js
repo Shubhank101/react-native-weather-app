@@ -12,5 +12,18 @@ export default {
     catch (error) {
       console.log(error)
     }
+  },
+  
+  getWeatherData_async(cityName) {
+      let url = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&APPID=" + apiKey + "&units=metric";        
+      return new Promise((resolve, reject)=>{
+         axios.get(url)
+        .then(function (response) {
+           resolve(response.data);
+        })
+        .catch(function (error) {
+           reject(error);
+        });        
+      });    
   }
 }

@@ -3,6 +3,10 @@ import {View,FlatList,TouchableOpacity} from "react-native";
 import styles from './SettingsScreenComponentStyle.js';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SettingsScreenListItemComponent from './SettingsScreenListItemComponent.js';
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+
+import * as SettingsAction from './actions.js';
 
 var settingScreenObj = null;
 class SettingsScreenComponent extends React.Component {
@@ -26,21 +30,17 @@ class SettingsScreenComponent extends React.Component {
     headerStyle:styles.headerStyle,
   }
 
-  state = {
-    cities:["Delhi", "London"],
-  }
-
   render() {
     return (
       <View style={styles.container}>
         <FlatList
           style={{width:"100%",}}
-          data = {this.state.cities}
+          data = {this.props.cities}
           renderItem = {({item}) => {
               return (
                 <SettingsScreenListItemComponent
                   item={item}
-                  onDeletePress={this.callPress}/>
+                  onDeletePress={this.deletePressed}/>
               );
             }
           }
@@ -50,14 +50,19 @@ class SettingsScreenComponent extends React.Component {
     );
   }
 
-  callPress = (item) => {
-    var newCities = this.state.cities;
-    newCities.splice(newCities.indexOf(item), 1);
-    this.setState({
-      cities: newCities
-    });
-  }
-
+  deletePressed = (cityName) => {   
+    this.props.deleteCity(cityName);
+  }  
 }
 
-export default SettingsScreenComponent;
+mapStateToProps = (state,props) => {
+  return {
+    cities: state.homeReducer.cities
+  }
+}
+
+mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(SettingsAction,dispatch);
+}
+
+export default connect(mapStateToProps,mapDispatchToProps) (SettingsScreenComponent);

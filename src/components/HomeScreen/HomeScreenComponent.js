@@ -10,7 +10,8 @@ import Permissions from 'react-native-permissions';
 import Geocoder from 'react-native-geocoder';
 import AddNewCityScreenModal from 'WeatherApp/src/components/AddNewCityScreen/AddNewCityScreenModal.js';
 import {connect} from 'react-redux';
-import * as Actions from './actions.js';
+import * as HomeActions from './actions.js';
+import * as AddNewCityActions from 'WeatherApp/src/components/AddNewCityScreen/actions.js';
 
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
@@ -49,7 +50,6 @@ class HomeScreenComponent extends React.Component {
   }
 
 
-//cities : ["Paris", "London", "Delhi"],
   state = {
       _color : new Animated.Value(0),
       stackOpacity : new Animated.Value(0),
@@ -77,7 +77,7 @@ class HomeScreenComponent extends React.Component {
 
   onSwipeUp(gestureState) {
     var newIndex = this.state.currentCityIndex + 1;
-    if (newIndex >= this.state.cities.length) {
+    if (newIndex >= this.props.cities.length) {
       newIndex = 0
     }
 
@@ -100,7 +100,6 @@ class HomeScreenComponent extends React.Component {
       this._handlePermissionResult(response);
     });
 
-
     this.animateViews();
   }
 
@@ -115,25 +114,26 @@ class HomeScreenComponent extends React.Component {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
+          
 
           Geocoder.geocodePosition(location).then(res => {
             if (res.length > 0) {
                let geocodingObj = res[0];
-               this.setState(() => {
-                 return {
-                  cities:[geocodingObj.adminArea],
-                  subAdminArea:[geocodingObj.subAdminArea]
-                 }
-
+               Webservice.getWeatherData_async(geocodingObj.adminArea).then ((data) => {
+                 //add admin area
+                 this.props.cityAdded(geocodingObj.adminArea);
+                  this.setState({ isLoading: false });                 
                })
-               this.animateViews();
+               .catch(err =>{
+                 // add subadmin area // todo add error checking here
+                  this.props.cityAdded(geocodingObj.subAdminArea);
+                  this.setState({ isLoading: false });                  
+               });         
             }
-
           })
           .catch(err => {
             this.setState({ locationError: err.message })
           })
-
         },
         (error) => {
           //console.warn(error); this.setState({ error: error.message })
@@ -163,21 +163,11 @@ class HomeScreenComponent extends React.Component {
   }
 
  animateViews = async() => {
-    if (this.state.cities.length == 0) {
+    if (this.props.cities.length == 0) {
       return;
     }
-    var json = await Webservice.getWeatherData(this.state.cities[this.state.currentCityIndex]);
-    if (json == null) {
-      json = await Webservice.getWeatherData(this.state.subAdminArea[this.state.currentCityIndex]);
-      if (json) {
-        // replace state cities with subAdminArea
-        var newCities = this.state.cities;
-        newCities[this.state.currentCityIndex] = this.state.subAdminArea[this.state.currentCityIndex];
-        this.setState((prevState) => {
-          cities: newCities
-        });
-      }
-    }
+    var json = await Webservice.getWeatherData(this.props.cities[this.state.currentCityIndex]);
+    
     let weatherInfo = HomeScreenWeatherModel.getWeatherObjectFromJSON(json);
     this.setState({
       weatherInfo: weatherInfo
@@ -210,23 +200,18 @@ class HomeScreenComponent extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.currentCityAdded) {
+    setTimeout(()=>{
+      
       this.setState((prevState) => {
         return {
-          cities:[...prevState.cities, nextProps.currentCityAdded],
-          subAdminArea:[...prevState.subAdminArea, nextProps.currentCityAdded],
-          shouldShowAddCityPopup:false,
-          currentCityIndex: prevState.cities.length
-        }
+          currentCityIndex: Math.max(this.props.cities.length - 1,0)
+        }                   
       });
-
-      this.props.clearCityAdded();
+      
       this.resetState();
-      setTimeout(()=>{
-        this.animateViews();
-      },300);
+      this.animateViews();      
+    },300);
 
-    }
   }
 
   renderWeatherIcon = () => {
@@ -260,10 +245,9 @@ class HomeScreenComponent extends React.Component {
 
 
 
-    if (this.state.cities.length == 0) {
+    if (this.props.cities.length == 0) {
 
-      if (this.state.locationError) {
-        // show onboarding
+      if (this.state.locationError || !this.state.isLoading) {
         return (
           <View style={styles.onBoardContainer}>
               <Text style={styles.onboardingText}> Go Ahead and add city </Text>
@@ -272,6 +256,7 @@ class HomeScreenComponent extends React.Component {
         )
       }
       else if (this.state.isLoading) {
+        //show Onboarding
         return (
           <View style={styles.onBoardContainer}>
               <Text style={styles.onboardingText}> Loading </Text>
@@ -300,7 +285,7 @@ class HomeScreenComponent extends React.Component {
                 <Animated.View style={[styles.container,{backgroundColor: color}]}>
 
                     <Text style={styles.cityTitle}>
-                      {this.state.cities[this.state.currentCityIndex]}
+                      {this.props.cities[this.state.currentCityIndex]}
                     </Text>
 
                     <Text style={styles.cityWeatherInfo}>
@@ -347,14 +332,15 @@ class HomeScreenComponent extends React.Component {
 mapStateToProps = (state) => {
 
   return {
-    currentCityAdded:state.cityReducer.city,
+    cities:state.homeReducer.cities,
     shouldShowAddCityPopup:state.homeReducer.shouldShowAddCityPopup
   }
 
 }
 
 mapDispatchToProps = (dispatch) => {
-  return bindActionCreators(Actions,dispatch);
+  let combinedActions = Object.assign(HomeActions,AddNewCityActions);
+  return bindActionCreators(combinedActions,dispatch);
 }
 
 export default connect(mapStateToProps,mapDispatchToProps)(HomeScreenComponent);

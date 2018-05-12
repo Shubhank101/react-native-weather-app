@@ -9,10 +9,13 @@ export default style = StyleSheet.create({
     alignItems:'center',
   },
 
+  /*
+     justifyContent:"center",
+    alignItems:"center",
+    */
   modalContainer: {
     flex:1,
-    justifyContent:"center",
-    alignItems:"center",
+    overflow:"hidden",
     paddingTop:50,
     width:"100%",
     paddingLeft:30,
