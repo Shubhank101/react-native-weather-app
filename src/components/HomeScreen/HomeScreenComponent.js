@@ -117,7 +117,7 @@ class HomeScreenComponent extends React.Component {
           
 
           Geocoder.geocodePosition(location).then(res => {
-            if (res.length > 0) {
+            if (res.length > 0 && this.props.cities.length == 0) {
                let geocodingObj = res[0];
                Webservice.getWeatherData_async(geocodingObj.adminArea).then ((data) => {
                  //add admin area
@@ -200,18 +200,18 @@ class HomeScreenComponent extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    setTimeout(()=>{
-      
-      this.setState((prevState) => {
-        return {
-          currentCityIndex: Math.max(this.props.cities.length - 1,0)
-        }                   
-      });
-      
-      this.resetState();
-      this.animateViews();      
-    },300);
-
+    if (nextProps.cities.length != this.props.cities.length) {
+        setTimeout(()=>{
+          this.setState((prevState) => {
+            return {
+              currentCityIndex: Math.max(this.props.cities.length - 1,0)
+            }                   
+          });
+        
+          this.resetState();
+          this.animateViews();      
+        },300);
+    }
   }
 
   renderWeatherIcon = () => {

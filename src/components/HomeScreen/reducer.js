@@ -13,7 +13,12 @@ const homeScreenReducer = (state = dataState, action) => {
       state = Object.assign({}, state, { shouldShowAddCityPopup: true });
       return state;
     case CITY_ADDED:
-        state = Object.assign({}, state, { cities:[...state.cities,action.data],
+        var newCities = state.cities.slice();
+        if (newCities.indexOf(action.data) == -1) {
+           newCities.push(action.data);
+        }
+        
+        state = Object.assign({}, state, { cities:newCities,
                                            shouldShowAddCityPopup: false });
         return state;
     case CITY_MODAL_DISMISS:
