@@ -12,6 +12,7 @@ import AddNewCityScreenModal from 'WeatherApp/src/components/AddNewCityScreen/Ad
 import {connect} from 'react-redux';
 import * as HomeActions from './actions.js';
 import * as AddNewCityActions from 'WeatherApp/src/components/AddNewCityScreen/actions.js';
+import Toast from 'react-native-root-toast';
 
 var homeScreenComp; // to use in navigation right button
 class HomeScreenComponent extends React.Component {
@@ -61,7 +62,10 @@ class HomeScreenComponent extends React.Component {
                      ['rgba(0, 0, 0, 1)', 'rgba(0, 191, 255, 1)'],
                      ['rgba(0, 0, 0, 1)', 'rgba(70, 70, 70, 1)'],
                      ['rgba(0, 0, 0, 1)', 'rgba(220, 70, 70, 1)'],
-                     ['rgba(0, 0, 0, 1)', 'rgba(150, 75, 30, 1)']],
+                     ['rgba(0, 0, 0, 1)', 'rgba(150, 75, 30, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(225, 10, 10, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(100, 100, 100, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(10, 10, 210, 1)']],
       currentCityIndex:0,
       weatherInfo:null,
       isLoading:true
@@ -116,7 +120,7 @@ class HomeScreenComponent extends React.Component {
           };
           
 
-          Geocoder.geocodePosition(location).then(res => {
+          Geocoder.geocodePosition(location).then(res => {          
             if (res.length > 0 && this.props.cities.length == 0) {
                let geocodingObj = res[0];
                Webservice.getWeatherData_async(geocodingObj.adminArea).then ((data) => {
@@ -211,7 +215,24 @@ class HomeScreenComponent extends React.Component {
           this.resetState();
           this.animateViews();      
         },300);
-    }
+        
+        
+      if (nextProps.cities.length >= 2) {
+        let toast = Toast.show('Swipe up to change cities', {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow: false,
+            animation: true,
+            hideOnPress: true,
+            delay: 0,   
+        });
+        
+        setTimeout(function () {
+            Toast.hide(toast);
+        }, 2000);
+      }
+      
+    }   
   }
 
   renderWeatherIcon = () => {
@@ -228,6 +249,9 @@ class HomeScreenComponent extends React.Component {
         break;
       case "Night":
         icon = "ios-moon";
+        break;
+      case "Rain":
+        icon = "ios-rainy";
         break;
     }
 
