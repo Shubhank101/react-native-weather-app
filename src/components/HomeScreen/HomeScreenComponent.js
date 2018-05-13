@@ -65,7 +65,8 @@ class HomeScreenComponent extends React.Component {
                      ['rgba(0, 0, 0, 1)', 'rgba(150, 75, 30, 1)'],
                      ['rgba(0, 0, 0, 1)', 'rgba(225, 10, 10, 1)'],
                      ['rgba(0, 0, 0, 1)', 'rgba(100, 100, 100, 1)'],
-                     ['rgba(0, 0, 0, 1)', 'rgba(10, 10, 210, 1)']],
+                     ['rgba(0, 0, 0, 1)', 'rgba(10, 10, 210, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(40, 200, 40, 1)']],
       currentCityIndex:0,
       weatherInfo:null,
       isLoading:true
@@ -241,9 +242,6 @@ class HomeScreenComponent extends React.Component {
       case "Clouds":
         icon = "ios-cloudy";
         break;
-      case "Haze":
-        icon = "ios-sunny";
-        break;
       case "Clear":
         icon = "ios-sunny";
         break;
@@ -252,6 +250,9 @@ class HomeScreenComponent extends React.Component {
         break;
       case "Rain":
         icon = "ios-rainy";
+        break;
+       default:
+        icon = "ios-information-circle"
         break;
     }
 

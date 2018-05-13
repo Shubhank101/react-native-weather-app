@@ -14,7 +14,7 @@ const homeScreenReducer = (state = dataState, action) => {
       return state;
     case CITY_ADDED:
         var newCities = state.cities.slice();
-        if (newCities.indexOf(action.data) == -1) {
+        if (newCities.indexOf(action.data) == -1 && newCities.length < 9) {
            newCities.push(action.data);
         }
         
