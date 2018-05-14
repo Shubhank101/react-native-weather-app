@@ -19,7 +19,7 @@ class SettingsScreenComponent extends React.Component {
   static navigationOptions = {
     title:'Settings',
     headerTintColor: '#fff',
-    headerTitleStyle :{ width: '90%', textAlign:'center', alignSelf:'center' },
+    headerTitleStyle :{ width: '70%', textAlign:'center', alignSelf:'center' },
     headerLeft: (
       <TouchableOpacity onPress={() => {
         settingScreenObj.props.navigation.goBack();
@@ -50,9 +50,9 @@ class SettingsScreenComponent extends React.Component {
     );
   }
 
-  deletePressed = (cityName) => {   
+  deletePressed = (cityName) => {
     this.props.deleteCity(cityName);
-  }  
+  }
 }
 
 mapStateToProps = (state,props) => {

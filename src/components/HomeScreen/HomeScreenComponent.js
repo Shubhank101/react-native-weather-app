@@ -66,7 +66,8 @@ class HomeScreenComponent extends React.Component {
                      ['rgba(0, 0, 0, 1)', 'rgba(225, 10, 10, 1)'],
                      ['rgba(0, 0, 0, 1)', 'rgba(100, 100, 100, 1)'],
                      ['rgba(0, 0, 0, 1)', 'rgba(10, 10, 210, 1)'],
-                     ['rgba(0, 0, 0, 1)', 'rgba(40, 200, 40, 1)']],
+                     ['rgba(0, 0, 0, 1)', 'rgba(40, 200, 40, 1)'],
+                     ['rgba(0, 0, 0, 1)', 'rgba(80, 200, 80, 1)']],
       currentCityIndex:0,
       weatherInfo:null,
       isLoading:true
@@ -102,68 +103,77 @@ class HomeScreenComponent extends React.Component {
      Permissions.check('location').then(response => {
       // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
       this.setState({ locationPermission: response })
-      this._handlePermissionResult(response);
+      this.handlePermissionResult(response);
     });
 
     this.animateViews();
   }
 
 
-  _handlePermissionResult = (result) => {
-    if (result == 'authorized') {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-
-          // Position Geocoding
-          let location = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          
-
-          Geocoder.geocodePosition(location).then(res => {          
-            if (res.length > 0 && this.props.cities.length == 0) {
-               let geocodingObj = res[0];
-               Webservice.getWeatherData_async(geocodingObj.adminArea).then ((data) => {
-                 //add admin area
-                 this.props.cityAdded(geocodingObj.adminArea);
-                  this.setState({ isLoading: false });                 
-               })
-               .catch(err =>{
-                 // add subadmin area // todo add error checking here
-                  this.props.cityAdded(geocodingObj.subAdminArea);
-                  this.setState({ isLoading: false });                  
-               });         
-            }
-          })
-          .catch(err => {
-            this.setState({ locationError: err.message })
-          })
-        },
-        (error) => {
-          //console.warn(error); this.setState({ error: error.message })
-          this.setState({ locationError: error.message })
-        },
-        { enableHighAccuracy: true, timeout: 20000 },
-      );
-
-
-
-
+  handlePermissionResult = (result) => {
+    switch (result) {
+      case "authorized" :
+        this.getUserLocation()
+        break;
+      case "undetermined" :
+        this.requestPermission();
+        break;
+      case "denied" :
+        this.setState({ locationError: "User didn't give location permission" })
+        break;
+      case "restricted":
+        this.setState({ locationError: "User didn't give location permission" })
+        break;
+      default:
+        console.warn("Unknown permission");
     }
-    else if (result == 'undetermined') {
-      this._requestPermission();
-    }
-    else if (result == 'denied') {
-      this.setState({ locationError: "User didn't give location permission" })
-    }
+
   }
 
-  _requestPermission = () => {
+  getUserLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+
+        // Position Geocoding
+        let location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+
+
+        Geocoder.geocodePosition(location).then(res => {
+          if (res.length > 0 && this.props.cities.length == 0) {
+             let geocodingObj = res[0];
+             Webservice.getWeatherData_async(geocodingObj.adminArea).then ((data) => {
+               //add admin area
+               this.props.cityAdded(geocodingObj.adminArea);
+                this.setState({ isLoading: false });
+             })
+             .catch(err =>{
+               // add subadmin area // todo add error checking here
+                this.props.cityAdded(geocodingObj.subAdminArea);
+                this.setState({ isLoading: false });
+             });
+          }
+        })
+        .catch(err => {
+          this.setState({ locationError: err.message })
+        })
+      },
+      (error) => {
+        //console.warn(error); this.setState({ error: error.message })
+        this.setState({ locationError: error.message })
+      },
+      { enableHighAccuracy: true, timeout: 20000 },
+    );
+
+  }
+
+  requestPermission = () => {
       Permissions.request('location').then(response => {
 
         this.setState({ locationPermission: response })
-        this._handlePermissionResult(response);
+        this.handlePermissionResult(response);
       })
   }
 
@@ -172,7 +182,7 @@ class HomeScreenComponent extends React.Component {
       return;
     }
     var json = await Webservice.getWeatherData(this.props.cities[this.state.currentCityIndex]);
-    
+
     let weatherInfo = HomeScreenWeatherModel.getWeatherObjectFromJSON(json);
     this.setState({
       weatherInfo: weatherInfo
@@ -210,30 +220,34 @@ class HomeScreenComponent extends React.Component {
           this.setState((prevState) => {
             return {
               currentCityIndex: Math.max(this.props.cities.length - 1,0)
-            }                   
+            }
           });
-        
+
           this.resetState();
-          this.animateViews();      
+          this.animateViews();
         },300);
-        
-        
-      if (nextProps.cities.length >= 2) {
-        let toast = Toast.show('Swipe up to change cities', {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow: false,
-            animation: true,
-            hideOnPress: true,
-            delay: 0,   
-        });
-        
-        setTimeout(function () {
-            Toast.hide(toast);
-        }, 2000);
-      }
-      
-    }   
+    }
+
+    if (nextProps.infoMessage != null) {
+      //show toast
+      this.showToast(nextProps.infoMessage);
+      this.props.clearInfoMsg();
+    }
+  }
+
+  showToast = (msg) => {
+    let toast = Toast.show(msg, {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+        shadow: false,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+    });
+
+    setTimeout(function () {
+        Toast.hide(toast);
+    }, 2000);
   }
 
   renderWeatherIcon = () => {
@@ -358,7 +372,8 @@ mapStateToProps = (state) => {
 
   return {
     cities:state.homeReducer.cities,
-    shouldShowAddCityPopup:state.homeReducer.shouldShowAddCityPopup
+    shouldShowAddCityPopup:state.homeReducer.shouldShowAddCityPopup,
+    infoMessage:state.homeReducer.infoMessage
   }
 
 }

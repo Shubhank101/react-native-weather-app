@@ -1,6 +1,8 @@
 import React from 'react';
 import {View,Text,StyleSheet} from 'react-native';
 import { NavigationActions } from 'react-navigation';
+import styles from './SplashScreenCompStyle.js';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 class SplashScreenComponent extends React.Component {
   static navigationOptions = {
@@ -19,24 +21,17 @@ class SplashScreenComponent extends React.Component {
   componentDidMount() {
     setTimeout( () => {
       this.resetNavigation('Home');
-    }, 1000);
+    }, 2000);
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text> Splash </Text>
+        <Icon name="ios-rainy" color="#555" size={140}/>
+        <Text style={styles.splashText}> Made with love using <Text style={styles.reactNativeText}>React Native</Text> </Text>
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-   container: {
-     flex:1,
-     justifyContent:'center',
-     alignItems:'center',
-   }
-});
 
 export default SplashScreenComponent;
